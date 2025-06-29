@@ -194,11 +194,11 @@ st.markdown("""<div style='margin-top: 30px;'></div>""", unsafe_allow_html=True)
 
 # ========================================================== BASE DE DADOS ================================================================
 
-# Carregamento dos dados
-@st.cache_data
-
 st.write("Diretório atual:", os.getcwd())
 st.write("Arquivos no diretório:", os.listdir())
+
+# Carregamento dos dados
+@st.cache_data
 
 def load_data():
     if not os.path.exists("heart.csv"):
