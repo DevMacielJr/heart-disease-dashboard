@@ -206,6 +206,12 @@ def load_data():
 with st.spinner('Carregando dados...'):
     df = load_data()
 
+
+if df.empty:
+    st.error("⚠️ Base de dados não carregada. O app não pode continuar sem o arquivo heart.csv.")
+    st.stop()
+
+
 # Sidebar: filtros expandidos
 st.sidebar.header("Filtros de Pacientes")
 
