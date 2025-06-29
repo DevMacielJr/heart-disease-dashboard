@@ -194,17 +194,21 @@ st.markdown("""<div style='margin-top: 30px;'></div>""", unsafe_allow_html=True)
 
 # ========================================================== BASE DE DADOS ================================================================
 
-st.write("Diretório atual:", os.getcwd())
-st.write("Arquivos no diretório:", os.listdir())
-
 # Carregamento dos dados
 @st.cache_data
 
 def load_data():
-    if not os.path.exists("heart.csv"):
-        st.error("⚠️ Arquivo 'heart.csv' não encontrado. Verifique se ele está no repositório.")
-        return pd.DataFrame()  # retorna dataframe vazio
-    return pd.read_csv("heart.csv")
+    base_dir = os.getcwd()  # pega o diretório atual do app
+    file_path = os.path.join(base_dir, "heart.csv")
+    st.write(f"Tentando abrir arquivo: {file_path}")
+    if not os.path.exists(file_path):
+        st.error(f"⚠️ Arquivo 'heart.csv' não encontrado no caminho {file_path}")
+        return pd.DataFrame()
+    return pd.read_csv(file_path)
+
+df = load_data()
+if df.empty:
+    st.stop()  # para o app se o DataFrame estiver vazio (arquivo não carregado)
 
 with st.spinner('Carregando dados...'):
     df = load_data()
