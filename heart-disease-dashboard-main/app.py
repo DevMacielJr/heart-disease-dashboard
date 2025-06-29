@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc
 import streamlit.components.v1 as components
+import os
+
 
 # Configuração da Página
 st.set_page_config(page_title="Dashboard Cardiológico", layout="wide")
