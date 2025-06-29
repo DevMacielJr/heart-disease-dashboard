@@ -196,6 +196,9 @@ st.markdown("""<div style='margin-top: 30px;'></div>""", unsafe_allow_html=True)
 @st.cache_data
 
 def load_data():
+    if not os.path.exists("heart.csv"):
+        st.error("⚠️ Arquivo 'heart.csv' não encontrado. Verifique se ele está no repositório.")
+        return pd.DataFrame()  # retorna dataframe vazio
     return pd.read_csv("heart.csv")
 
 with st.spinner('Carregando dados...'):
