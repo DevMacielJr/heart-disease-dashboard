@@ -200,7 +200,7 @@ st.markdown("""<div style='margin-top: 30px;'></div>""", unsafe_allow_html=True)
 def load_data():
     base_dir = os.getcwd()  # pega o diretório atual do app
     file_path = os.path.join(base_dir, "heart.csv")
-    st.write(f"Tentando abrir arquivo: {file_path}")
+    #st.write(f"Tentando abrir arquivo: {file_path}")
     if not os.path.exists(file_path):
         st.error(f"⚠️ Arquivo 'heart.csv' não encontrado no caminho {file_path}")
         return pd.DataFrame()
