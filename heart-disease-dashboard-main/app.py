@@ -197,6 +197,9 @@ st.markdown("""<div style='margin-top: 30px;'></div>""", unsafe_allow_html=True)
 # Carregamento dos dados
 @st.cache_data
 
+st.write("Diretório atual:", os.getcwd())
+st.write("Arquivos no diretório:", os.listdir())
+
 def load_data():
     if not os.path.exists("heart.csv"):
         st.error("⚠️ Arquivo 'heart.csv' não encontrado. Verifique se ele está no repositório.")
