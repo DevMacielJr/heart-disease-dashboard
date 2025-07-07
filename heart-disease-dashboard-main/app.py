@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc
 import streamlit.components.v1 as components
 import os
+from sklearn.cluster import KMeans  # certifique-se de que isso está no topo
 
 
 # Configuração da Página
@@ -343,8 +344,8 @@ div[role="tab"]:hover {
 """, unsafe_allow_html=True)
 
 # Definição das abas, só texto simples
-aba1, aba2, aba3, aba4, aba5, aba6 = st.tabs([
-    "Visão Geral", "Gráficos", "Animações", "Modelo Preditivo", "Simular Previsão", "Sobre o Autor"
+aba1, aba2, aba3, aba4, aba5, aba6, aba7 = st.tabs([
+    "Visão Geral", "Gráficos", "Animações", "Modelo Preditivo", "Simular Previsão", "Modelo Preditivo", "Sobre o Autor"
 ])
 
 # Aba 1 - Visão Geral
@@ -961,8 +962,78 @@ with aba5:
             ⚠️ **Importante:** Esta ferramenta é apenas para fins educativos e não substitui avaliação médica profissional.
             """)
 
-# Aba 6 - Sobre o autor
+# Aba 6 - Agrupamento com K-Means
 with aba6:
+
+    # Seleção do número de clusters
+    #k = st.slider("Número de Grupos (k):", min_value=2, max_value=6, value=3)
+
+    st.subheader("Agrupamento de Pacientes - K-Means Clustering")
+
+    if df_filtrado.shape[0] < 10:
+        st.warning("⚠️ Dados insuficientes para formar clusters. Aplique filtros menos restritivos.")
+    else:
+        st.markdown("Escolha as variáveis que deseja usar para agrupar os pacientes:")
+
+        # Seleção de variáveis numéricas para clustering
+        variaveis_cluster = st.multiselect(
+            "Variáveis para Clustering:",
+            df_filtrado.select_dtypes(include='number').columns.tolist(),
+            default=["age", "chol", "thalach", "trestbps"]
+        )
+
+        if len(variaveis_cluster) >= 2:
+            df_cluster = df_filtrado[variaveis_cluster].dropna()
+
+            # Padronização dos dados
+            scaler = StandardScaler()
+            dados_padronizados = scaler.fit_transform(df_cluster)
+
+            st.markdown("""
+                Este agrupamento é feito sem usar o diagnóstico.  
+                Ou seja, os grupos são definidos com base nas **semelhanças entre variáveis clínicas**, o que pode revelar **padrões ocultos** no perfil dos pacientes.
+            """)
+
+            # Seleção do número de clusters
+            k = st.slider("Número de Grupos (k):", min_value=2, max_value=6, value=3)
+
+            # Treinamento do K-Means
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+            grupos = kmeans.fit_predict(dados_padronizados)
+
+            df_resultado = df_filtrado.copy()
+            df_resultado["Grupo"] = grupos.astype(str)  # Para usar como categoria em gráficos
+
+            # Gráfico de Dispersão com dois primeiros componentes
+            st.markdown("### Visualização dos Grupos (reduzido a 2D)")
+
+            from sklearn.decomposition import PCA
+            pca = PCA(n_components=2)
+            componentes = pca.fit_transform(dados_padronizados)
+            df_plot = pd.DataFrame(componentes, columns=["PC1", "PC2"])
+            df_plot["Grupo"] = df_resultado["Grupo"].values
+
+            fig_kmeans = px.scatter(
+                df_plot,
+                x="PC1", y="PC2",
+                color="Grupo",
+                title="Grupos de Pacientes com K-Means",
+                color_discrete_sequence=px.colors.qualitative.Set2
+            )
+            st.plotly_chart(fig_kmeans, use_container_width=True)
+
+            st.markdown("---")
+
+            # Perfil médio de cada grupo
+            st.markdown("### Estatísticas por Grupo")
+            resumo = df_resultado.groupby("Grupo")[variaveis_cluster].mean().round(1)
+            st.dataframe(resumo.style.highlight_max(axis=0), use_container_width=True)
+
+        else:
+            st.info("ℹ️ Selecione pelo menos duas variáveis para formar os grupos.")
+
+# Aba 7 - Sobre o autor
+with aba7:
     st.subheader("Sobre o Autor")
 
     # CSS para foto redonda e elegante
